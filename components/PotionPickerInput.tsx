@@ -4,58 +4,61 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, Modal, Button } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 
-// Props 타입 정의
+/**
+ * (수정) Props 타입 정의
+ * 부모로부터 'value' (현재 값)를 받도록 추가합니다.
+ */
 type PotionPickerInputProps = {
+  value: number; // 부모(index.tsx)가 관리하는 현재 값
   onCountChange: (count: number) => void;
 };
 
 // 1부터 100까지의 숫자 배열 (미리 생성)
 const potionCounts = Array.from({ length: 100 }, (_, i) => i + 1);
 
-export const PotionPickerInput: React.FC<PotionPickerInputProps> = ({ onCountChange }) => {
+/**
+ * (수정) PotionPickerInput 컴포넌트
+ * 이제 부모로부터 'value'를 전달받습니다.
+ */
+export const PotionPickerInput: React.FC<PotionPickerInputProps> = ({ value, onCountChange }) => {
   
-  // 내부 State
-  // (수정) 사용자가 '확인'을 눌러야 값이 바뀌도록 임시 State 'tempCount'를 추가합니다.
-  const [selectedCount, setSelectedCount] = useState(1); // 최종 선택된 값
-  const [tempCount, setTempCount] = useState(selectedCount); // Picker에서 임시로 선택 중인 값
+  // tempCount는 모달(팝업) 안에서만 사용할 임시 값입니다.
+  const [tempCount, setTempCount] = useState(value === 0 ? 1 : value);
   const [isModalVisible, setModalVisible] = useState(false);
 
-  // Picker 모달을 열 때, 현재 최종 값을 임시 값으로 설정
+  // Picker 모달을 열 때, 부모의 현재 값(value)으로 임시 값을 설정
   const openModal = () => {
-    setTempCount(selectedCount);
+    // 부모의 값이 0(선택안함)이면 1을, 아니면 그 값을 기본으로
+    setTempCount(value === 0 ? 1 : value);
     setModalVisible(true);
   };
 
   // "확인" 버튼을 눌렀을 때
   const handleConfirm = () => {
-    setSelectedCount(tempCount); // 임시 값을 최종 값으로 확정
-    onCountChange(tempCount);      // 1. 부모(index.tsx)에게 보고
-    setModalVisible(false);        // 2. 모달 닫기
+    // 임시 값(tempCount)을 부모(index.tsx)에게 바로 보고합니다.
+    onCountChange(tempCount);
+    setModalVisible(false);
   };
 
-  // "취소" 버튼을 눌렀을 때
   const handleCancel = () => {
     setModalVisible(false);
-    // 임시 값을 버리고, 원래 값으로 둡니다.
-  };
-
-  // (수정) placeholder 로직을 좀 더 명확하게
-  const getSelectedText = () => {
-    if (selectedCount === 1 && !isModalVisible) {
-      // 이 부분은 초기 값이 1일 때 placeholder를 어떻게 보여줄지 정해야 합니다.
-      // 우선 1개로 표시되도록 수정합니다.
-      return `${selectedCount} 개`; 
-    }
-    return `${selectedCount} 개`;
   };
 
   return (
     <View style={{ width: '100%' }}>
       {/* 입력창처럼 보이는 버튼 */}
-      {/* (수정) onPress 시 openModal 함수 호출 */}
       <TouchableOpacity style={styles.input} onPress={openModal}>
-        <Text style={styles.inputText}>
-          {selectedCount === 0 ? '사용할 장인 포션 개수' : `${selectedCount} 개`}
+        
+        {/*
+          (수정) 표시되는 텍스트
+          이제 부모로부터 받은 'value' prop을 기준으로 텍스트를 표시합니다.
+          value가 0이면(선택 안 됨) placeholder(회색)를 보여줍니다.
+        */}
+        <Text style={[
+            styles.inputText,
+            value === 0 && styles.placeholderText // value가 0이면 회색으로
+        ]}>
+          {value === 0 ? '사용할 장인 포션 개수' : `${value} 개`}
         </Text>
       </TouchableOpacity>
 
@@ -70,14 +73,10 @@ export const PotionPickerInput: React.FC<PotionPickerInputProps> = ({ onCountCha
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>포션 개수 선택</Text>
             
-            {/* --- (핵심 수정) --- */}
             <Picker
-              // (수정) 임시 값(tempCount)을 사용
               selectedValue={tempCount}
               onValueChange={(itemValue) => setTempCount(itemValue)}
-              // (수정) 1. Picker의 높이를 200으로 지정
               style={{ width: '100%', height: 200 }} 
-              // (수정) 2. item의 글자색을 검은색으로 강제 지정
               itemStyle={{ color: 'black', fontFamily: 'Mulish-Regular', fontSize: 18 }} 
             >
               {potionCounts.map((count) => (
@@ -85,7 +84,6 @@ export const PotionPickerInput: React.FC<PotionPickerInputProps> = ({ onCountCha
               ))}
             </Picker>
             
-            {/* (수정) 버튼 영역 추가 */}
             <View style={styles.buttonRow}>
               <Button title="취소" onPress={handleCancel} color="red" />
               <Button title="확인" onPress={handleConfirm} />
@@ -99,7 +97,6 @@ export const PotionPickerInput: React.FC<PotionPickerInputProps> = ({ onCountCha
 
 // --- 스타일 ---
 const styles = StyleSheet.create({
-  // (input, inputText 스타일은 기존과 동일)
   input: {
     width: '100%',
     height: 50,
@@ -114,6 +111,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Mulish-Regular',
     color: '#000000',
+  },
+  // (새로 추가) value가 0일 때 (placeholder일 때) 적용할 스타일
+  placeholderText: {
+    color: '#AAAAAA',
   },
   modalBackdrop: {
     flex: 1,
@@ -133,7 +134,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontFamily: 'Mulish-Regular',
   },
-  // (수정) 버튼을 가로로 배치하기 위한 스타일
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',

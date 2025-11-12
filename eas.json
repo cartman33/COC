@@ -1,0 +1,22 @@
+{
+  "cli": { 
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "projectId": "f26d79ed-f0c2-4987-96b6-b3f775448c24" 
+    },
+    "preview": {
+      "distribution": "internal",
+      "projectId": "f26d79ed-f0c2-4987-96b6-b3f775448c24" 
+    },
+    "production": {
+      "projectId": "f26d79ed-f0c2-4987-96b6-b3f775448c24" 
+    }
+  },
+  "submit": {
+
+  }
+}
+

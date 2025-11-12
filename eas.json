@@ -1,22 +1,18 @@
 {
-  "cli": { 
+  "cli": {
+    "version": ">= 7.6.0"
   },
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal",
-      "projectId": "f26d79ed-f0c2-4987-96b6-b3f775448c24" 
+      "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal",
-      "projectId": "f26d79ed-f0c2-4987-96b6-b3f775448c24" 
+      "distribution": "internal"
     },
-    "production": {
-      "projectId": "f26d79ed-f0c2-4987-96b6-b3f775448c24" 
-    }
+    "production": {}
   },
   "submit": {
-
+    "production": {}
   }
 }
-

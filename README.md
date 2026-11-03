@@ -57,14 +57,6 @@
 
 ---
 
-### 5. 사진
-
-| 메인 화면 로고 | 푸터 브랜딩 | 앱 실행 화면 (예시) |
-| :---: | :---: | :---: |
-| <img src="./coc.png" width="220" /> | <img src="./footer.png" width="100" /> | *(실제 실행 캡처 이미지 등록)* |
-
----
-
 ### 🛠 Tech Stack
 
 * **Framework**: React Native, Expo (Expo Router)
